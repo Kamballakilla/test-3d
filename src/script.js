@@ -10,7 +10,6 @@ const gui = new dat.GUI()
 
 const textureLoader = new THREE.TextureLoader();
 const texture = textureLoader.load('/textures/paper_seamless_texture.jpg'); 
-console.log(texture)
 
 texture.wrapS = THREE.RepeatWrapping;
 texture.wrapT = THREE.RepeatWrapping;
@@ -553,104 +552,6 @@ function calculateIntersectionArea(circle) {
 }
 
 // Задание 7
-// function createSceneWithLandscape() {
-//     clearScene() // Очистка сцены перед добавлением новых объектов
-   
-//     const size = 2048;  // Размер карты
-//     const divisions = 248; // Разделение на ячейки
-
-//     // Генерируем случайную высоту для ландшафта от 0 до 20
-//     const terrainGeometry = new THREE.PlaneGeometry(size, size, divisions, divisions);
-//     const terrainVertices = terrainGeometry.attributes.position.array;
-
-//     for (let i = 0; i < terrainVertices.length; i += 3) {
-//         terrainVertices[i + 2] = Math.random() * 20;  // Важно: массив хранит координаты (x, y, z), и z - это высота
-//     }
-
-//     // Применяем материал для ландшафта
-//     const terrainMaterial = new THREE.MeshBasicMaterial({
-//         color: 0x8B4513,
-//         wireframe:true
-//     });
-
-//     // Создаем объект Mesh для ландшафта
-//     const terrain = new THREE.Mesh(terrainGeometry, terrainMaterial);
-//     terrain.rotation.x = - Math.PI / 2;  // Поворачиваем плоскость, чтобы она стала горизонтальной
-//     scene.add(terrain);
-
-//     const raycaster = new THREE.Raycaster();
-//     const mouse = new THREE.Vector2();
-
-
-//     function calculateIntersectedVolume(intersectPoint) {
-//         const cubeSize = 32; // Размер куба
-//         const cellSize = size / divisions; // Размер ячейки ландшафта
-//         const startX = Math.floor((intersectPoint.x + size / 2 - cubeSize / 2) / cellSize);
-//         const startY = Math.floor((intersectPoint.z + size / 2 - cubeSize / 2) / cellSize);
-//         const endX = Math.ceil((intersectPoint.x + size / 2 + cubeSize / 2) / cellSize);
-//         const endY = Math.ceil((intersectPoint.z + size / 2 + cubeSize / 2) / cellSize);
-
-//         let volume = 0;
-
-//         for (let x = startX; x < endX; x++) {
-//             for (let y = startY; y < endY; y++) {
-//                 const index = (y * (divisions + 1) + x) * 3 + 2; // Индекс Z-координаты
-//                 const height = terrainVertices[index]; // Высота ландшафта в данной вершине
-//                 const localX = x * cellSize - size / 2;
-//                 const localY = y * cellSize - size / 2;
-
-//                 // Определяем пересечение с кубом
-//                 const cubeTop = intersectPoint.y + cubeSize / 2;
-//                 const cubeBottom = intersectPoint.y - cubeSize / 2;
-
-//                 if (height > cubeBottom) {
-//                     const intersectHeight = Math.min(height, cubeTop) - cubeBottom;
-//                     const intersectArea = cellSize * cellSize;
-//                     volume += intersectHeight * intersectArea;
-//                 }
-//             }
-//         }
-//         return volume;
-//     }
-
-//     function onMouseClick(event) {
-//         // Преобразуем координаты мыши в систему координат WebGL
-//         mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-//         mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
-
-//         raycaster.setFromCamera(mouse, camera);
-//         const intersects = raycaster.intersectObject(terrain);
-
-
-//         if (intersects.length > 0) {
-//             // Получаем точку на ландшафте, куда был совершен клик
-//             const intersectPoint = intersects[0].point;
-
-//             // Создание куба 32x32
-//             const cubeGeometry = new THREE.BoxGeometry(32, 32, 32);
-//             const cubeMaterial = new THREE.MeshBasicMaterial({ color: 0x0000ff});
-//             const cube = new THREE.Mesh(cubeGeometry, cubeMaterial);
-//             cube.position.set(intersectPoint.x, intersectPoint.y, intersectPoint.z); // Устанавливаем куб в точку клика
-//             scene.add(cube);
-
-//             const volume = calculateIntersectedVolume(intersectPoint);
-//             console.log(`Объём ландшафта, вошедшего в куб: ${volume.toFixed(2)}`);
-//             console.log(`Объём части куба, не пересекающейся с ландшафтом: ${32768 - volume.toFixed(2)}`);
-
-
-
-            
-
-
-
-
-//         }
-//     }
-
-//     // Добавляем обработчик кликов
-//     setClickHandler(onMouseClick);
-// }
-
 function createSceneWithLandscape() {
     clearScene(); // Очистка сцены перед добавлением новых объектов
    
@@ -783,16 +684,6 @@ function createSceneWithLandscape() {
             const volume = calculateTerrainVolumeInCube(intersectPoint,terrainVertices, size, divisions)
 
             console.log(volume)
-
-
-
-
-
-
-
-          
-
-           
         }
     }
 
@@ -800,80 +691,97 @@ function createSceneWithLandscape() {
     setClickHandler(onMouseClick);
 }
 
-// Задание 9
-function createPlaneWithHexagons(){
-
+// Задание 8
+function createPlaneWithHexagons() {
     clearScene(); 
 
-    const planeSize = 2048;
+    const planeSize = 2048; // Размер плоскости
 
-
-    const plainGeometry = new THREE.PlaneGeometry(2048, 2048, 100, 100);
-    // Применяем материал для ландшафта
+    // Создаем плоскость для фона
+    const plainGeometry = new THREE.PlaneGeometry(planeSize, planeSize, 100, 100);
     const planeMaterial = new THREE.MeshBasicMaterial({
         color: 0x8B4513,
     });
 
-    // Создаем объект Mesh для ландшафта
     const plane = new THREE.Mesh(plainGeometry, planeMaterial);
-    plane.position.z -= 10
+    plane.position.z -= 10;
 
-    scene.add(plane)
+    scene.add(plane);
 
-
-
-    
     const hexRadius = 50; // Радиус вписанной окружности шестиугольника
-    const hexWidth = Math.sqrt(3) * hexRadius;
-    const hexHeight = 2 * hexRadius;
+    const hexWidth = Math.sqrt(3) * hexRadius; // Ширина шестиугольника
+    const hexHeight = 2 * hexRadius; // Высота шестиугольника
 
-    // / Функция создания шестиугольника
-    function createHexagonMesh(x, y) {
+    // Функция для создания шестиугольника
+    function createHexagonGeometry() {
         const geometry = new THREE.BufferGeometry();
         const vertices = [];
         for (let i = 0; i < 6; i++) {
-            const angle = (Math.PI / 3) * i; // Угол между вершинами
-            const vx = x + hexRadius * Math.cos(angle);
-            const vy = y + hexRadius * Math.sin(angle);
+            const angle = (Math.PI / 3) * i;
+            const vx = hexRadius * Math.cos(angle);
+            const vy = hexRadius * Math.sin(angle);
             vertices.push(vx, vy, 0);
         }
-        vertices.push(vertices[0], vertices[1], 0); // Замыкаем шестиугольник
 
-        const indices = [0, 1, 2, 0, 2, 3, 0, 3, 4, 0, 4, 5]; // Треугольники
+        // Замкнуть шестиугольник
+        vertices.push(vertices[0], vertices[1], 0);
+
+        const indices = [
+            0, 1, 2,
+            0, 2, 3,
+            0, 3, 4,
+            0, 4, 5
+        ];
+
         geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
         geometry.setIndex(indices);
         geometry.computeVertexNormals();
 
-        const uv = [
-            0.5, 0.5,  
-            1, 0.5,  
-            0.75, 1,
-            0.25, 1,
-            0, 0.5,
-            0.25, 0,
-            0.75, 0
-        ];
+        // Установка UV-координат
+        const uv = [];
+        for (let i = 0; i < 6; i++) {
+            uv.push(0.5 + 0.5 * Math.cos((Math.PI / 3) * i));
+            uv.push(0.5 + 0.5 * Math.sin((Math.PI / 3) * i));
+        }
+        uv.push(0.5, 0.5); // Центральный UV
+
         geometry.setAttribute('uv', new THREE.Float32BufferAttribute(uv, 2));
 
-        console.log(geometry)
-
-        const material = new THREE.MeshBasicMaterial({  map:texture, side: THREE.DoubleSide });
-        return new THREE.Mesh(geometry, material);
+        return geometry;
     }
 
+    const hexGeometry = createHexagonGeometry();
+    const hexMaterial = new THREE.MeshBasicMaterial({ map: texture, side: THREE.DoubleSide });
 
-    // Создание сетки шестиугольников
-    const hexGroup = new THREE.Group();
+    // Определяем количество строк и столбцов
+    const rows = Math.ceil(planeSize / (hexHeight * 0.75));
+    const cols = Math.ceil(planeSize / hexWidth);
+    const instanceCount = rows * cols;
+
+    // Создаем InstancedMesh для шестиугольников
+    const instancedMesh = new THREE.InstancedMesh(hexGeometry, hexMaterial, instanceCount);
+    scene.add(instancedMesh);
+
+    let instanceIndex = 0;
     for (let y = -planeSize / 2; y < planeSize / 2; y += hexHeight * 0.75) {
-    for (let x = -planeSize / 2; x < planeSize / 2; x += hexWidth) {
-        const offsetX = (Math.floor((y / (hexHeight * 0.75))) % 2 === 0) ? 0 : hexWidth / 2;
-        const hexMesh = createHexagonMesh(x + offsetX, y);
-        hexGroup.add(hexMesh);
+        for (let x = -planeSize / 2; x < planeSize / 2; x += hexWidth) {
+            // Для четных рядов сдвиг по X не нужен, для нечетных — на половину ширины
+            const offsetX = (Math.floor((y / (hexHeight * 0.75))) % 2 === 0) ? 0 : hexWidth / 2;
+            console.log(offsetX)
+
+            const rowIndex = Math.floor((y / (hexHeight * 0.75)));
+
+            const matrix = new THREE.Matrix4();
+            matrix.setPosition(new THREE.Vector3(x + offsetX, y, 0));
+            instancedMesh.setMatrixAt(instanceIndex, matrix);
+            instanceIndex++;
+        }
     }
 }
 
-scene.add(hexGroup);
-}
+
+
+
 
 
 
