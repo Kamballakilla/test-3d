@@ -8,6 +8,13 @@ import fragmentShader from './shaders/fragment.glsl'
 // Debug
 const gui = new dat.GUI()
 
+const textureLoader = new THREE.TextureLoader();
+const texture = textureLoader.load('./images/paper_seamless_texture.jpg'); 
+console.log(texture)
+
+texture.wrapS = THREE.RepeatWrapping;
+texture.wrapT = THREE.RepeatWrapping;
+
 
 const guiContainer = document.querySelector('.dg');
 
@@ -793,15 +800,8 @@ function createSceneWithLandscape() {
     setClickHandler(onMouseClick);
 }
 
+// Задание 9
 function createPlaneWithHexagons(){
-
-
-    const textureLoader = new THREE.TextureLoader();
-    const texture = textureLoader.load('./textures/paper_seamless_texture.jpg'); // Укажите путь к бесшовной текстуре
-    texture.wrapS = THREE.RepeatWrapping;
-    texture.wrapT = THREE.RepeatWrapping;
-
-
 
     clearScene(); 
 
@@ -844,7 +844,20 @@ function createPlaneWithHexagons(){
         geometry.setIndex(indices);
         geometry.computeVertexNormals();
 
-        const material = new THREE.MeshBasicMaterial({  map: texture, side: THREE.DoubleSide });
+        const uv = [
+            0.5, 0.5,  
+            1, 0.5,  
+            0.75, 1,
+            0.25, 1,
+            0, 0.5,
+            0.25, 0,
+            0.75, 0
+        ];
+        geometry.setAttribute('uv', new THREE.Float32BufferAttribute(uv, 2));
+
+        console.log(geometry)
+
+        const material = new THREE.MeshBasicMaterial({  map:texture, side: THREE.DoubleSide });
         return new THREE.Mesh(geometry, material);
     }
 
@@ -859,7 +872,7 @@ function createPlaneWithHexagons(){
     }
 }
 
-scene.add(hexGroup,light);
+scene.add(hexGroup);
 }
 
 
