@@ -549,7 +549,7 @@ function createSceneWithLandscape() {
     clearScene(); // Очистка сцены перед добавлением новых объектов
    
     const size = 2048;  // Размер карты
-    const divisions = 248; // Разделение на ячейки
+    const divisions = 700; // Разделение на ячейки
 
     // Генерируем случайную высоту для ландшафта от 0 до 20
     const terrainGeometry = new THREE.PlaneGeometry(size, size, divisions, divisions);
@@ -560,9 +560,9 @@ function createSceneWithLandscape() {
     }
 
     // Применяем материал для ландшафта
-    const terrainMaterial = new THREE.MeshBasicMaterial({
-        color: 0x8B4513,
-        wireframe:true
+    const terrainMaterial = new THREE.RawShaderMaterial({
+        vertexShader:vertexShader,
+        fragmentShader:fragmentShader,
     });
 
     // Создаем объект Mesh для ландшафта
