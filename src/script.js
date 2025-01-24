@@ -9,7 +9,7 @@ import fragmentShader from './shaders/fragment.glsl'
 const gui = new dat.GUI()
 
 const textureLoader = new THREE.TextureLoader();
-const texture = textureLoader.load('./images/paper_seamless_texture.jpg'); 
+const texture = textureLoader.load('/textures/paper_seamless_texture.jpg'); 
 console.log(texture)
 
 texture.wrapS = THREE.RepeatWrapping;
