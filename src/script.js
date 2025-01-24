@@ -8,13 +8,6 @@ import fragmentShader from './shaders/fragment.glsl'
 // Debug
 const gui = new dat.GUI()
 
-const textureLoader = new THREE.TextureLoader();
-const texture = textureLoader.load('/textures/paper_seamless_texture.jpg'); 
-
-texture.wrapS = THREE.RepeatWrapping;
-texture.wrapT = THREE.RepeatWrapping;
-
-
 const guiContainer = document.querySelector('.dg');
 
 // Добавляем обработчик событий
@@ -693,92 +686,90 @@ function createSceneWithLandscape() {
 
 // Задание 8
 function createPlaneWithHexagons() {
-    clearScene();
+    const textureLoader = new THREE.TextureLoader();
+    const texture = textureLoader.load('./textures/paper_seamless_texture.jpg');
+    texture.wrapS = THREE.RepeatWrapping;
+    texture.wrapT = THREE.RepeatWrapping;
 
-    const planeSize = 2048; // Размер плоскости
+    clearScene(); 
 
-    // Создаем плоскость для фона
-    const plainGeometry = new THREE.PlaneGeometry(planeSize, planeSize, 100, 100);
+    const planeSize = 2048;
+
+    const plainGeometry = new THREE.PlaneGeometry(2048, 2048, 100, 100);
+    // Применяем материал для ландшафта
     const planeMaterial = new THREE.MeshBasicMaterial({
         color: 0x8B4513,
+        side:THREE.DoubleSide
     });
 
+    // Создаем объект Mesh для ландшафта
     const plane = new THREE.Mesh(plainGeometry, planeMaterial);
     plane.position.z -= 10;
 
     scene.add(plane);
 
     const hexRadius = 50; // Радиус вписанной окружности шестиугольника
-    const hexWidth = Math.sqrt(3) * hexRadius; // Ширина шестиугольника
-    const hexHeight = 2 * hexRadius; // Высота шестиугольника
+    const hexWidth = Math.sqrt(3) * hexRadius;
+    const hexHeight = 2 * hexRadius;
 
-    // Функция для создания шестиугольника
-    function createHexagonGeometry() {
-        const geometry = new THREE.BufferGeometry();
-        const vertices = [];
-        for (let i = 0; i < 6; i++) {
-            const angle = (Math.PI / 3) * i;
-            const vx = hexRadius * Math.cos(angle);
-            const vy = hexRadius * Math.sin(angle);
-            vertices.push(vx, vy, 0);
-        }
+    // Создаем геометрию и материал для шестиугольников
+    const hexGeometry = new THREE.BufferGeometry();
+    const vertices = [];
+    const indices = [];
+    const uv = [];
 
-        // Замкнуть шестиугольник
-        vertices.push(vertices[0], vertices[1], 0);
-
-        const indices = [
-            0, 1, 2,
-            0, 2, 3,
-            0, 3, 4,
-            0, 4, 5
-        ];
-
-        geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
-        geometry.setIndex(indices);
-        geometry.computeVertexNormals();
-
-        // Установка UV-координат
-        const uv = [];
-        for (let i = 0; i < 6; i++) {
-            uv.push(0.5 + 0.5 * Math.cos((Math.PI / 3) * i));
-            uv.push(0.5 + 0.5 * Math.sin((Math.PI / 3) * i));
-        }
-        uv.push(0.5, 0.5); // Центральный UV
-
-        geometry.setAttribute('uv', new THREE.Float32BufferAttribute(uv, 2));
-
-        return geometry;
+    const angleOffset = Math.PI / 6;
+    for (let i = 0; i < 6; i++) {
+        const angle = angleOffset + (Math.PI / 3) * i;
+        vertices.push(
+            hexRadius * Math.cos(angle),
+            hexRadius * Math.sin(angle),
+            0
+        );
+        uv.push(
+            0.5 + 0.5 * Math.cos(angle),
+            0.5 + 0.5 * Math.sin(angle)
+        );
     }
+    vertices.push(vertices[0], vertices[1], 0); // Замыкаем шестиугольник
+    uv.push(0.5, 0.5); // Центральный UV
 
-    const hexGeometry = createHexagonGeometry();
-    const hexMaterial = new THREE.MeshBasicMaterial({ map: texture, side: THREE.DoubleSide });
+    indices.push(0, 1, 2, 0, 2, 3, 0, 3, 4, 0, 4, 5);
 
-    // Определяем количество строк и столбцов
-    const rows = Math.ceil(planeSize / hexHeight);
-    const cols = Math.ceil(planeSize / hexWidth);
-    const instanceCount = rows * cols;
+    hexGeometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
+    hexGeometry.setIndex(indices);
+    hexGeometry.setAttribute('uv', new THREE.Float32BufferAttribute(uv, 2));
+    hexGeometry.computeVertexNormals();
 
-    // Создаем InstancedMesh для шестиугольников
+    const hexMaterial = new THREE.MeshBasicMaterial({
+        map: texture,
+        side: THREE.DoubleSide,
+    });
+
+    // Создаем InstancedMesh
+    const countX = Math.ceil(planeSize / hexWidth);
+    const countY = Math.ceil(planeSize / (hexHeight * 0.75));
+    const instanceCount = countX * countY;
+
     const instancedMesh = new THREE.InstancedMesh(hexGeometry, hexMaterial, instanceCount);
-    scene.add(instancedMesh);
 
+    const dummyMatrix = new THREE.Matrix4();
     let instanceIndex = 0;
-    for (let x = -planeSize / 2; x < planeSize / 2; x += hexWidth) {
-        for (let y = -planeSize / 2; y < planeSize / 2; y += hexHeight) {
-            // Для четных рядов сдвиг по Y не нужен, для нечетных — на половину высоты
-            const colIndex = Math.floor((x / hexWidth));
-            const offsetY = ( colIndex  % 2 === 0) ? 0 : hexHeight / 2;
-    
-    
-            const matrix = new THREE.Matrix4();
-            matrix.setPosition(new THREE.Vector3(x, y + offsetY, 0));
-            instancedMesh.setMatrixAt(instanceIndex, matrix);
-            instanceIndex++;
+
+    for (let y = -planeSize / 2; y < planeSize / 2; y += hexHeight * 0.75) {
+        for (let x = -planeSize / 2; x < planeSize / 2; x += hexWidth) {
+            const offsetX = (Math.floor((y / (hexHeight * 0.75))) % 2 === 0) ? 0 : hexWidth / 2;
+            dummyMatrix.setPosition(x + offsetX, y, 0);
+            instancedMesh.setMatrixAt(instanceIndex++, dummyMatrix);
         }
     }
 
-
+    scene.add(instancedMesh);
 }
+
+
+
+
 
 
 
@@ -844,9 +835,10 @@ const camera = new THREE.PerspectiveCamera(
     75,
     sizes.width / sizes.height,
     0.1,
-    3000
+    5000
 )
-camera.position.set(0, 5, 20)
+camera.updateProjectionMatrix()
+camera.position.set(0, 0, 20)
 scene.add(camera)
 
 // Controls
@@ -859,6 +851,7 @@ controls.enableDamping = true
 const renderer = new THREE.WebGLRenderer({
     canvas: canvas,
     antialias: true,
+    logarithmicDepthBuffer: true
 })
 renderer.setSize(sizes.width, sizes.height)
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
