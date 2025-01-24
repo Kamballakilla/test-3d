@@ -693,7 +693,7 @@ function createSceneWithLandscape() {
 
 // Задание 8
 function createPlaneWithHexagons() {
-    clearScene(); 
+    clearScene();
 
     const planeSize = 2048; // Размер плоскости
 
@@ -754,7 +754,7 @@ function createPlaneWithHexagons() {
     const hexMaterial = new THREE.MeshBasicMaterial({ map: texture, side: THREE.DoubleSide });
 
     // Определяем количество строк и столбцов
-    const rows = Math.ceil(planeSize / (hexHeight * 0.75));
+    const rows = Math.ceil(planeSize / hexHeight);
     const cols = Math.ceil(planeSize / hexWidth);
     const instanceCount = rows * cols;
 
@@ -763,21 +763,23 @@ function createPlaneWithHexagons() {
     scene.add(instancedMesh);
 
     let instanceIndex = 0;
-    for (let y = -planeSize / 2; y < planeSize / 2; y += hexHeight * 0.75) {
-        for (let x = -planeSize / 2; x < planeSize / 2; x += hexWidth) {
-            // Для четных рядов сдвиг по X не нужен, для нечетных — на половину ширины
-            const offsetX = (Math.floor((y / (hexHeight * 0.75))) % 2 === 0) ? 0 : hexWidth / 2;
-            console.log(offsetX)
-
-            const rowIndex = Math.floor((y / (hexHeight * 0.75)));
-
+    for (let x = -planeSize / 2; x < planeSize / 2; x += hexWidth) {
+        for (let y = -planeSize / 2; y < planeSize / 2; y += hexHeight) {
+            // Для четных рядов сдвиг по Y не нужен, для нечетных — на половину высоты
+            const colIndex = Math.floor((x / hexWidth));
+            const offsetY = ( colIndex  % 2 === 0) ? 0 : hexHeight / 2;
+    
+    
             const matrix = new THREE.Matrix4();
-            matrix.setPosition(new THREE.Vector3(x + offsetX, y, 0));
+            matrix.setPosition(new THREE.Vector3(x, y + offsetY, 0));
             instancedMesh.setMatrixAt(instanceIndex, matrix);
             instanceIndex++;
         }
     }
+
+
 }
+
 
 
 
