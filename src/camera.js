@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 
-const sizes = {
+export const sizes = {
     width: window.innerWidth,
     height: window.innerHeight,
 };

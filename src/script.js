@@ -29,11 +29,35 @@ setupGUI({
 });
 
 
+const sizes = {
+    width: window.innerWidth,
+    height: window.innerHeight,
+};
+
+
+
+window.addEventListener('resize', () => {
+    // Обновление размеров
+    sizes.width = window.innerWidth
+    sizes.height = window.innerHeight
+
+    // Обновление камеры
+    camera.aspect = sizes.width / sizes.height
+    camera.updateProjectionMatrix()
+
+    // Обновление рендерера
+    renderer.setSize(sizes.width, sizes.height)
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
+})
+
+
 const clock = new THREE.Clock()
 
 const tick = () => {
     // для анимации
     const elapsedTime = clock.getElapsedTime()
+
+    console.log(camera.position)
 
     // Обновление контроля
     controls.update()
