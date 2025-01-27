@@ -6,6 +6,10 @@ export function createSceneWithPlaneAndCircle(scene) {
     clearScene(scene)
     camera.position.set(0, 2, 10)
 
+    const squareSize = 8
+    const circleRadius = 4
+    const circleSegments = 100
+
     const planeMaterial = new THREE.MeshBasicMaterial({
         color: 0xaaaaaa,
         side: THREE.DoubleSide,
@@ -18,8 +22,8 @@ export function createSceneWithPlaneAndCircle(scene) {
         depthWrite: false,
     })
 
-    const planeGeometry = new THREE.PlaneGeometry(8, 8) // Плоскость 8x8
-    const circleGeometry = new THREE.CircleGeometry(4, 32) // Окружность радиусом 4 и 32 сегмента
+    const planeGeometry = new THREE.PlaneGeometry(squareSize, squareSize) 
+    const circleGeometry = new THREE.CircleGeometry(circleRadius, circleSegments)
 
     const plane = new THREE.Mesh(planeGeometry, planeMaterial)
     plane.position.set(0, 0, 0) // Позиция плоскости

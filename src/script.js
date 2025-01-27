@@ -57,8 +57,6 @@ const tick = () => {
     // для анимации
     const elapsedTime = clock.getElapsedTime()
 
-    console.log(camera.position)
-
     // Обновление контроля
     controls.update()
 
