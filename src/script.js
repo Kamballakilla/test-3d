@@ -5,40 +5,35 @@ import * as dat from 'dat.gui'
 import vertexShader from './shaders/vertex.glsl'
 import fragmentShader from './shaders/fragment.glsl'
 
-// Debug
+// UI
 const gui = new dat.GUI()
-
 const guiContainer = document.querySelector('.dg');
-
-// Добавляем обработчик событий
 guiContainer.addEventListener('click', function(event) {
   event.stopPropagation(); // Останавливаем распространение события
 });
 
-// Canvas
+// Создание сцены
 const canvas = document.querySelector('canvas.webgl')
-// Scene
 const scene = new THREE.Scene()
+
+
 
 let currentClickHandler = null
 
 // Функция для отчистки обработчика
 function setClickHandler(handler) {
-    // Удаляем предыдущий обработчик, если он есть
     if (currentClickHandler) {
-        window.removeEventListener('click', currentClickHandler)
+        console.log('Removing previous click handler');
+        window.removeEventListener('click', currentClickHandler);
     }
-
-    // Устанавливаем новый обработчик
     if (handler) {
-        window.addEventListener('click', handler)
+        console.log('Setting new click handler');
+        window.addEventListener('click', handler);
     }
-
-    // Сохраняем текущий обработчик
-    currentClickHandler = handler
+    currentClickHandler = handler;
 }
 
-// Функция для очистки сцены
+// Функция для отчистки сцены
 function clearScene() {
     // Удаляем все объекты из сцены
     while (scene.children.length) {
@@ -549,7 +544,7 @@ function createSceneWithLandscape() {
     clearScene(); // Очистка сцены перед добавлением новых объектов
    
     const size = 2048;  // Размер карты
-    const divisions = 700; // Разделение на ячейки
+    const divisions = 248; // Разделение на ячейки
 
     // Генерируем случайную высоту для ландшафта от 0 до 20
     const terrainGeometry = new THREE.PlaneGeometry(size, size, divisions, divisions);
@@ -563,6 +558,7 @@ function createSceneWithLandscape() {
     const terrainMaterial = new THREE.RawShaderMaterial({
         vertexShader:vertexShader,
         fragmentShader:fragmentShader,
+        wireframe:true
     });
 
     // Создаем объект Mesh для ландшафта
@@ -770,25 +766,6 @@ function createPlaneWithHexagons() {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 const taskConfig = {
     createSceneWithTwoCubes: () => createSceneWithTwoCubes(),
     createSceneWithCubesAndLines: () => createSceneWithCubesAndLines(),
@@ -806,7 +783,7 @@ for (const label of Object.keys(taskConfig)) {
 }
 
 /**
- * Sizes
+ * Размеры
  */
 const sizes = {
     width: window.innerWidth,
@@ -814,23 +791,23 @@ const sizes = {
 }
 
 window.addEventListener('resize', () => {
-    // Update sizes
+    // Обновление размеров
     sizes.width = window.innerWidth
     sizes.height = window.innerHeight
 
-    // Update camera
+    // Обновление камеры
     camera.aspect = sizes.width / sizes.height
     camera.updateProjectionMatrix()
 
-    // Update renderer
+    // Обновление рендерера
     renderer.setSize(sizes.width, sizes.height)
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
 })
 
 /**
- * Camera
+ * Камера
  */
-// Base camera
+// Основная камера
 const camera = new THREE.PerspectiveCamera(
     75,
     sizes.width / sizes.height,
@@ -841,12 +818,12 @@ camera.updateProjectionMatrix()
 camera.position.set(0, 0, 20)
 scene.add(camera)
 
-// Controls
+// Контроль
 const controls = new OrbitControls(camera, canvas)
 controls.enableDamping = true
 
 /**
- * Renderer
+ * Рендерер
  */
 const renderer = new THREE.WebGLRenderer({
     canvas: canvas,
@@ -857,7 +834,7 @@ renderer.setSize(sizes.width, sizes.height)
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
 
 /**
- * Animate
+ * Время для анимации
  */
 const clock = new THREE.Clock()
 
@@ -866,13 +843,13 @@ const tick = () => {
 
 
 
-    // Update controls
+    // Обновление контроля
     controls.update()
 
-    // Render
+    // Рендер
     renderer.render(scene, camera)
 
-    // Call tick again on the next frame
+    // Вызов tick каждые 1/60
     window.requestAnimationFrame(tick)
 }
 
